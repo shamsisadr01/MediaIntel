@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MediaIntel.App/MediaIntel.App.csproj" />
+  <Project Path="MediaIntel.MediaPipeline/MediaIntel.MediaPipeline.csproj" />
+</Solution>
