@@ -23,7 +23,7 @@ namespace MediaIntel
             appSettings.TaskProgress = new Progress<double>(percent =>
             {
                 ProgressBar.Value = (int)percent;
-                ProgressLable.Text = $"{(int)percent}%";
+                ProgressLable.Text = $"{percent:F2}%".Replace('/', '.');
             });
 
             ServiceFactory serviceFactory = new ServiceFactory(appSettings);
@@ -43,6 +43,8 @@ namespace MediaIntel
 
                 if (jobSettings.ShowDialog() == DialogResult.OK)
                 {
+                    ServiceFactory serviceFactory = new ServiceFactory(appSettings);
+                    appService = new AppService(serviceFactory);
                     ClearQueue_Click(sender, e);
                     appService.CreateJob(jobSettings.JobSettingsBatch.FolderPath, jobSettings.JobSettingsBatch.BatchActions);
                     LoadRootIntoTreeView();
@@ -75,6 +77,8 @@ namespace MediaIntel
                             DataGridViewBindingExtensions.SelectRowByItem(DataView, item);
                         });
                         LoadRootIntoTreeView();
+                        ResetProgressUI();
+                        await Task.Delay(100);
                     }
                     RunProccess.Enabled = false;
                 }
@@ -287,7 +291,7 @@ namespace MediaIntel
 
         private void MediaIntel_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if(isRunning)
+            if (isRunning)
             {
                 appService.CancelProccess();
             }

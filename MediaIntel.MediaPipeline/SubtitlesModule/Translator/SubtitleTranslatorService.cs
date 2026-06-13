@@ -1,67 +1,60 @@
-﻿using MediaIntel.MediaPipeline.AIModule;
-using MediaIntel.MediaPipeline.Application.Settings;
+﻿using MediaIntel.MediaPipeline.AIModule.Models;
+using MediaIntel.MediaPipeline.AIModule.Services;
 using MediaIntel.MediaPipeline.SubtitlesModule.Extensions;
 using Nikse.SubtitleEdit.Core.Common;
 using Nikse.SubtitleEdit.Core.SubtitleFormats;
-using System.Text.RegularExpressions;
 
 namespace MediaIntel.MediaPipeline.SubtitlesModule.Translator
 {
     public class SubtitleTranslatorService : ISubtitleTranslatorService
     {
-        private readonly IAiService _aiService;
-        private readonly int maxRetryCount;
-        private readonly string language;
+        private readonly LlmTranslationService translationService;
         private readonly IProgress<double> progress;
 
-        public SubtitleTranslatorService(IAiService aiService, IProgress<double> progress = null, string language = "fa", int maxRetryCount = 3)
+
+        public SubtitleTranslatorService(IProgress<double> progress, LlmTranslationService translationService)
         {
-            _aiService = aiService;
-            this.maxRetryCount = maxRetryCount;
-            this.language = language;
             this.progress = progress;
+            this.translationService = translationService;
         }
 
         public async Task<bool> ProcessSubtitleInBatchesAsync(string filePath, CancellationToken cancellationToken)
         {
-            if (!Path.Exists(filePath))
+            if (!File.Exists(filePath))
                 return false;
 
-            var newFilePath = SubtitleExtensions.GetLocalizedFilePath(filePath, language);
+            var newFilePath = SubtitleExtensions.GetLocalizedFilePath(filePath, translationService.Language);
 
             try
             {
                 var subtitle = Subtitle.Parse(filePath);
 
-                var sentences = SubtitleExtensions.SentenceDetection(subtitle.Paragraphs);
-                int maxCount = subtitle.Paragraphs.Count;
-                int index = 0;
-                foreach (var sentence in sentences)
+                var subtitleItems = subtitle.Paragraphs.Select(p => new SubtitleItem
                 {
-                    var inputText = string.Join("\n",
-                              sentence.Select((l, i) => $"[{i}] {l.Text}")
-                      );
+                    Index = p.Number,
+                    Text = p.Text
+                }).ToArray();
 
 
-                    index += sentence.Count;
-                    progress?.Report((index * 100) / maxCount);
-
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    var lines = await TranslateSubtitleRangeAsync(inputText, sentence.Count,cancellationToken);
-                    for (int i = 0; i < sentence.Count; i++)
+                int processedCount = 0;
+                await translationService.TranslateSubtitlesInBatchesAsync(subtitleItems, async batch =>
+                {
+                    for (int i = 0; i < batch.TranslatedLines.Length; i++)
                     {
-                        sentence[i].Text = SubtitleExtensions.ApplyRtlEmbedding(lines[i]);
+                        cancellationToken.ThrowIfCancellationRequested();
+                        subtitle.Paragraphs[batch.StartIndex + i].Text = SubtitleExtensions.ApplyRtlEmbedding(batch.TranslatedLines[i]);
+                        int currentProcessed = Interlocked.Increment(ref processedCount);
+                        progress?.Report((processedCount / (double)subtitleItems.Length) * 100d);
+                        await Task.Delay(150, cancellationToken);
                     }
-             
-                }
+                }, cancellationToken);
 
                 var extension = Path.GetExtension(filePath);
                 string finalText = extension.ToLowerInvariant() switch
                 {
                     ".srt" => subtitle.ToText(new SubRip()),
                     ".vtt" => subtitle.ToText(new WebVTT()),
-                    ".ass" => subtitle.ToText(new AdvancedSubStationAlpha()), 
+                    ".ass" => subtitle.ToText(new AdvancedSubStationAlpha()),
                     ".ssa" => subtitle.ToText(new SubStationAlpha()),
                     _ => throw new Exception($"Unsupported subtitle format: {extension}")
                 };
@@ -76,29 +69,5 @@ namespace MediaIntel.MediaPipeline.SubtitlesModule.Translator
             }
         }
 
-
-        private async Task<string[]> TranslateSubtitleRangeAsync(string inputText, int count, CancellationToken cancellationToken = default, int retryCount = 0)
-        {
-            var translatedText = await _aiService.SendRequsetAsync(inputText, cancellationToken);
-
-            string pattern = @"(?:^|\r?\n)\[\d+\]\s*";
-            string[] translatedLines = Regex.Split(translatedText, pattern)
-                                .Where(s => !string.IsNullOrWhiteSpace(s))
-                                .ToArray();
-
-            if (count != translatedLines.Length)
-            {
-                if (retryCount >= maxRetryCount)
-                {
-                    throw new Exception(
-                        $"Translation failed after {maxRetryCount} retries because the translated segment count did not match."
-                    );
-                }
-
-                return await TranslateSubtitleRangeAsync(inputText, count,cancellationToken, retryCount + 1);
-            }
-
-            return translatedLines;
-        }
     }
 }

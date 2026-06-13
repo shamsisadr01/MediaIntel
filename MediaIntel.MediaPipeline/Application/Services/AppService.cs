@@ -105,8 +105,6 @@ namespace MediaIntel.MediaPipeline.Application.Services
 
             try
             {
-            
-
                 switch (jobStep.Action)
                 {
                     case BatchAction.BurnSubtitle:

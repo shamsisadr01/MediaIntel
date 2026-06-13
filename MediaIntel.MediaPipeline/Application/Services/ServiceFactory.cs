@@ -1,6 +1,6 @@
 ﻿using MediaIntel.MediaPipeline.AIModule.Extensions;
 using MediaIntel.MediaPipeline.AIModule.Models;
-using MediaIntel.MediaPipeline.AIModule.Providers;
+using MediaIntel.MediaPipeline.AIModule.Services;
 using MediaIntel.MediaPipeline.Application.Settings;
 using MediaIntel.MediaPipeline.FFmpegModule.Services;
 using MediaIntel.MediaPipeline.ScannerModule.Services;
@@ -31,8 +31,9 @@ namespace MediaIntel.MediaPipeline.Application.Services
         public ISubtitleTranslatorService CreateSubtitleTranslatorService()
         {
             var modelOptions = _settings.Container.Get<AiModelOptions>();
-            var gapgptService = new GapgptService(modelOptions);
-            return new SubtitleTranslatorService(gapgptService, _settings.TaskProgress, modelOptions.Language.ToLanguageCode());
+            var chatService = new LlmChatService(modelOptions.aiProvider,modelOptions.ApiKey, modelOptions.Model.ToApiModelString());
+            LlmTranslationService llmTranslationService = new LlmTranslationService(chatService, modelOptions.Language.ToLanguageCode());
+            return new SubtitleTranslatorService(_settings.TaskProgress, llmTranslationService);
         }
     }
 

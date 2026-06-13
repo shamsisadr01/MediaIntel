@@ -12,8 +12,9 @@
 
   <ItemGroup>
     <PackageReference Include="FFMpegCore" Version="5.4.0" />
+    <PackageReference Include="Google.GenAI" Version="1.9.0" />
     <PackageReference Include="libse" Version="4.0.12" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.7.0" />
     <PackageReference Include="RestSharp" Version="114.0.0" />
     <PackageReference Include="Whisper.net" Version="1.9.0" />
     <PackageReference Include="Whisper.net.Runtime" Version="1.9.0" />

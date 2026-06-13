@@ -1,5 +1,6 @@
 ﻿using MediaIntel.MediaPipeline.AIModule.Enums;
 using MediaIntel.MediaPipeline.AIModule.Models;
+using MediaIntel.MediaPipeline.AIModule.Services;
 using MediaIntel.MediaPipeline.Application.Models;
 using System.ComponentModel;
 
@@ -15,13 +16,14 @@ namespace MediaIntel
 
             ModelComboBox.DataSource = Enum.GetValues(typeof(AiModel));
             languageComboBox.DataSource = Enum.GetValues(typeof(Language));
+            aiProviderComboBox.DataSource = Enum.GetValues(typeof(AiProvider));
         }
 
         public void Initialize()
         {
             languageComboBox.SelectedIndex = (int)JobSettingsBatch.AiModelOptions.Language;
             ModelComboBox.SelectedIndex = (int)JobSettingsBatch.AiModelOptions.Model;
-            BaseUrlModel.Text = JobSettingsBatch.AiModelOptions.BaseUrl;
+            aiProviderComboBox.SelectedIndex = (int)JobSettingsBatch.AiModelOptions.aiProvider;
             apiKeyTextBox.Text = JobSettingsBatch.AiModelOptions.ApiKey;
         }
 
@@ -29,7 +31,7 @@ namespace MediaIntel
         {
             JobSettingsBatch.AiModelOptions.Language = (Language)languageComboBox.SelectedIndex;
             JobSettingsBatch.AiModelOptions.Model = (AiModel)ModelComboBox.SelectedIndex;
-            JobSettingsBatch.AiModelOptions.BaseUrl = BaseUrlModel.Text;
+            JobSettingsBatch.AiModelOptions.aiProvider = (AiProvider)aiProviderComboBox.SelectedIndex;
             JobSettingsBatch.AiModelOptions.ApiKey = apiKeyTextBox.Text;
 
 

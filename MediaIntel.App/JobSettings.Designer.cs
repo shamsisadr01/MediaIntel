@@ -42,8 +42,8 @@
             ModelComboBox = new ComboBox();
             languageComboBox = new ComboBox();
             apiKeyTextBox = new TextBox();
-            BaseUrlModel = new TextBox();
             panel1 = new Panel();
+            aiProviderComboBox = new ComboBox();
             Job.SuspendLayout();
             AISettings.SuspendLayout();
             panel1.SuspendLayout();
@@ -119,6 +119,7 @@
             // 
             // AISettings
             // 
+            AISettings.Controls.Add(aiProviderComboBox);
             AISettings.Controls.Add(Model);
             AISettings.Controls.Add(Language);
             AISettings.Controls.Add(BaseUrl);
@@ -126,7 +127,6 @@
             AISettings.Controls.Add(ModelComboBox);
             AISettings.Controls.Add(languageComboBox);
             AISettings.Controls.Add(apiKeyTextBox);
-            AISettings.Controls.Add(BaseUrlModel);
             AISettings.Dock = DockStyle.Top;
             AISettings.Location = new Point(0, 0);
             AISettings.Name = "AISettings";
@@ -134,7 +134,6 @@
             AISettings.Size = new Size(359, 140);
             AISettings.TabIndex = 4;
             AISettings.TabStop = false;
-            AISettings.Text = "Gapgpt AI";
             // 
             // Model
             // 
@@ -159,9 +158,9 @@
             BaseUrl.AutoSize = true;
             BaseUrl.Location = new Point(12, 30);
             BaseUrl.Name = "BaseUrl";
-            BaseUrl.Size = new Size(49, 15);
+            BaseUrl.Size = new Size(65, 15);
             BaseUrl.TabIndex = 8;
-            BaseUrl.Text = "Base Url";
+            BaseUrl.Text = "Ai Provider";
             // 
             // ApiKey
             // 
@@ -200,14 +199,6 @@
             apiKeyTextBox.Size = new Size(226, 23);
             apiKeyTextBox.TabIndex = 5;
             // 
-            // BaseUrlModel
-            // 
-            BaseUrlModel.Location = new Point(132, 22);
-            BaseUrlModel.Name = "BaseUrlModel";
-            BaseUrlModel.RightToLeft = RightToLeft.No;
-            BaseUrlModel.Size = new Size(226, 23);
-            BaseUrlModel.TabIndex = 4;
-            // 
             // panel1
             // 
             panel1.Controls.Add(CreateJob);
@@ -216,6 +207,16 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(359, 56);
             panel1.TabIndex = 4;
+            // 
+            // aiProvider
+            // 
+            aiProviderComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            aiProviderComboBox.FormattingEnabled = true;
+            aiProviderComboBox.Location = new Point(132, 22);
+            aiProviderComboBox.Name = "aiProvider";
+            aiProviderComboBox.RightToLeft = RightToLeft.No;
+            aiProviderComboBox.Size = new Size(226, 23);
+            aiProviderComboBox.TabIndex = 12;
             // 
             // JobSettings
             // 
@@ -250,7 +251,6 @@
         private ComboBox ModelComboBox;
         private ComboBox languageComboBox;
         private TextBox apiKeyTextBox;
-        private TextBox BaseUrlModel;
         private Label BaseUrl;
         private Label ApiKey;
         private Label Language;
@@ -258,5 +258,6 @@
         private Button CreateJob;
         private Panel panel1;
         private Label showPath;
+        private ComboBox aiProviderComboBox;
     }
 }

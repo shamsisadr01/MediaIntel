@@ -1,4 +1,6 @@
-﻿namespace MediaIntel.MediaPipeline.AIModule.Enums
+﻿using MediaIntel.MediaPipeline.AIModule.Services;
+
+namespace MediaIntel.MediaPipeline.AIModule.Enums
 {
     public enum AiModel
     {
@@ -92,5 +94,4 @@
         Qwen3Coder,
         Qwen3Coder480B_A35B_Instruct
     }
-
 }

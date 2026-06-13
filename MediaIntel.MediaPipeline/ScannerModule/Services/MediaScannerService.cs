@@ -59,7 +59,7 @@ namespace MediaIntel.MediaPipeline.ScannerModule.Services
                         string videoName = video.GetFileName();
                         var subtitle = subtitles.FirstOrDefault(s =>
                         {
-                            var subBase =  s.GetFileName();
+                            var subBase = s.GetFileName();
                             return string.Equals(subBase, videoName, StringComparison.OrdinalIgnoreCase)
                                 || subBase.StartsWith(videoName, StringComparison.OrdinalIgnoreCase);
                         });

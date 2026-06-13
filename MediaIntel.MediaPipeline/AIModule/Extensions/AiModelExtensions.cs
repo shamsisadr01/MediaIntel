@@ -1,4 +1,5 @@
 ﻿using MediaIntel.MediaPipeline.AIModule.Enums;
+using MediaIntel.MediaPipeline.AIModule.Services;
 
 namespace MediaIntel.MediaPipeline.AIModule.Extensions
 {
@@ -102,6 +103,4 @@ namespace MediaIntel.MediaPipeline.AIModule.Extensions
             };
         }
     }
-
-
 }
